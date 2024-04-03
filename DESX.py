@@ -1,5 +1,10 @@
+import numpy as np
+
+blockSize = 3 #TODO zamienic na 64 w finalnej wersji
+
+
 def desX(dane, klucz):
-    output = []
+    output = bytearray()
     sBox = \
         [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,  # S1
          0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8,
@@ -45,11 +50,38 @@ def desX(dane, klucz):
 
 
 def xor(dane, klucz):
-    output = []
-    dane_b = bytearray(dane,"utf-8")
-    klucz_b = bytearray(klucz,"utf-8")
-    for i in range(len(dane_b)):
-        dane_b[i] = dane_b[i] ^ klucz_b[i]
-    print("Dane ",dane," dane_b ",dane_b)
-    output = dane_b.decode("utf-8")
+    output = bytearray()
+    blocks = podzielNaBloki(dane)
+    klucz_b = bytearray(klucz, "utf-8")
+
+    for b in blocks:
+        dane_b = b
+        # dane_b = bytearray(b, "utf-8")
+        for i in range(len(b)):
+            dane_b[i] = dane_b[i] ^ klucz_b[i]  # Tu odbywa się XOR-owanie poszczególnych bitów
+        output += dane_b
+
+    print("Dane ", dane, " dane_b ", output)
     return output
+
+
+def xorFromString(dane, klucz):
+    dane = bytearray(dane, "utf-8")
+    output = xor(dane,klucz)                    #odwołanie do XOR-owania
+    output = output.decode("utf-8")
+    return output
+
+
+def podzielNaBloki(data):
+    blocks = []
+
+    for i in range(0, len(data), blockSize):
+        block = data[i:i + blockSize]
+        if len(block) < blockSize:
+            block += b"\x00" * (blockSize - len(block))  # Uzupełnienie zerami(bitowymi) , jeśli blok jest krótszy
+        blocks.append(block)
+    return blocks
+
+
+def daneNaTabliceBitów(dane):
+    return bytearray(dane, "utf-8")
