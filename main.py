@@ -30,7 +30,7 @@ def doTheDesX(dane, klucz):
     if len(klucz) == keyProperLenth:
         entryOutput.config(state="normal")
         entryOutput.delete(0, "end")
-        entryOutput.insert(0, DESX.xorFromString(dane, klucz))
+        entryOutput.insert(0, DESX.desX(dane, klucz))
         entryOutput.config(state="readonly")
     else:
         print("Klucz jest niepoprawnej długości!!!")

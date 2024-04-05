@@ -7,7 +7,7 @@ blockSize = 8  # Kazdy blok danych jest reprezentowany jako 64 bitowy
 
 
 def desX(dane, klucz):
-    if (len(klucz) != 24):              #sprawdzamy czy ten podany klucz jest poprawnej dlugosci
+    if (len(klucz) != 24):  # sprawdzamy czy ten podany klucz jest poprawnej dlugosci
         print(len(klucz))
         ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza", "Błąd", 0)
         return
@@ -19,7 +19,7 @@ def desX(dane, klucz):
     for i in range(len(klucze)):
         klucze[i] = kluczNaInt64(klucze[i])
 
-
+    # Przygotowanie zmiennej do której weźmiemy wyjscie
     output = np.int64()
 
     #####################################
@@ -29,14 +29,36 @@ def desX(dane, klucz):
         blokiDanych[i] = xor(blokiDanych[i], klucze[0])
 
     #####################################
-    #               DES                 #
+    #            DES KLUCZE             #
     #####################################
 
     # Rozpoczynamy od operacji na kluczu (z tablicy wybieramy ten pod indeksem 1, bo ten jest dla DES-a)
+    klucze[1] = permutationPC1(klucze[1])
+    L, R = podkluczeLewyPrawy(klucze[1])
 
-    permutation1(klucze[1])
+    RolNum = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
 
+    LeweKlucze = []
+    PraweKlucze = []
 
+    LeweKlucze.append(ROL(L, RolNum[0]))
+    PraweKlucze.append(ROL(R, RolNum[0]))
+
+    for i in range(15):
+        LeweKlucze.append(ROL(LeweKlucze[i], RolNum[i + 1]))
+        PraweKlucze.append(ROL(PraweKlucze[i], RolNum[i + 1]))
+    # Po otrzymaniu Lewych i Prawych części podkluczy musimy je teraz ze sobą połączyć
+
+    kluczeDlaDES = []
+    for i in range(16):
+        kluczeDlaDES.append(zlaczLewyPrawy(LeweKlucze[i], PraweKlucze[i]))
+
+    # Otrzymujemy dzieki tym funkcja pełen zestaw do obróbki danych
+
+    #####################################
+    #       DES - CZĘŚĆ WŁAŚCIWA        #
+    #####################################
+    #TODO tu jade jutro
     sBox = \
         [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,  # S1
          0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8,
@@ -132,14 +154,15 @@ def kluczNaInt64(klucz):  # Funkcja zwraca klucz w int64(który ma być podany j
 
 
 def getXPosFrom64Bits(var, x):
-    x = int(x)
+    x = np.int64(x)
+    var = np.int64(var)
     mask = 1 << (64 - x)
     var = var & mask
     var = var >> (64 - x)
     return var
 
 
-def permutation1(klucz):
+def permutationPC1(klucz):
     permuted = 0
     pc_1 = [57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26, 18, 10, 2, 59, 51, 43, 35, 27, 19, 11, 3, 60, 52, 44, 36,
             63, 55, 47, 39, 31, 23, 15, 7, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21, 13, 5, 28, 20, 12, 4]
@@ -150,7 +173,7 @@ def permutation1(klucz):
     return permuted
 
 
-def permutation2(klucz):
+def permutationPC2(klucz):
     permuted = 0
     pc_1 = [14, 17, 11, 24, 1, 5, 3, 28, 15, 6, 21, 10, 23, 19, 12, 4, 26, 8, 16, 7, 27, 20, 13, 2, 41, 52, 31, 37, 47,
             55, 30, 40, 51, 45, 33, 48, 44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32]
@@ -163,3 +186,43 @@ def permutation2(klucz):
 
 def kluczNa3(klucz):  # funkcja zwraca liste kluczy
     return [klucz[i:i + blockSize] for i in range(0, len(klucz), blockSize)]
+
+
+def podkluczeLewyPrawy(klucz):
+    maska = (1 << 28) - 1
+    L = klucz ^ maska
+    R = klucz & maska
+    return L, R
+
+
+def zlaczLewyPrawy(L, P):
+    klucz = L
+    klucz = klucz << 28
+    klucz += P
+    return klucz
+
+
+def ROL(klucz, count):  # funkcja do kręcenia podkluczami (28 bitowymi), realnie przyjmuje tylko 1 i 2 w count
+    maska = 0
+    bity = 0
+    if count == 2:
+        maska = (3 << (28 - count))
+        bity = klucz & maska
+        klucz -= bity
+        klucz = klucz << 2
+        bity = bity >> 26
+        klucz += bity
+    else:
+        maska = (1 << (28 - count))
+        bity = klucz & maska
+        klucz -= bity
+        klucz = klucz << 1
+        bity = bity >> 27
+        klucz += bity
+    return klucz
+
+
+def permutationIP():
+    tablicaIP = [58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38, 30, 22, 14, 6, 64, 56,
+                 48, 40, 32, 24, 16, 8, 57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3, 61, 53, 45, 37, 29,
+                 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7]

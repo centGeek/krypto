@@ -62,6 +62,13 @@ import bitarray as bit
 # liczba = 0b0001001100110100010101110111100110011011101111001101111111110001
 # print(bin(permutation1(liczba)))
 
-#print(kluczNa3("1234567890123456abcdefghijklomnprstuwyxyz1234567"))
+# print(kluczNa3("1234567890123456abcdefghijklomnprstuwyxyz1234567"))
 
-desX("12345678akljshdflksdahugfsdruygpoiearutg[oasriug[oasdijg;lasdijg;aiuh[qwoerirfuas[dcji[aosdiuf[oasid", "12345678abcdefgh12345678")
+desX("12345678akljshdflksdahugfsdruygpoiearutg[oasriug[oasdijg;lasdijg;aiuh[qwoerirfuas[dcji[aosdiuf[oasid",
+     "12345678abcdefgh12345678")
+
+np.int64()
+
+print(ROL(201326591, 2))
+
+print(zlaczLewyPrawy(134217728, 134217728))
