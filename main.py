@@ -9,7 +9,7 @@ from DESX import *
 import tkinter as tk
 
 
-keyProperLenth = 3
+keyProperLenth = 16
 
 
 def show_text_data(event=None):
