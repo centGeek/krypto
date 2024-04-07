@@ -1,8 +1,13 @@
+import codecs
+import struct
 import sys
 import numpy as np
+import tkinter as tk
+
 from DESX import *
 
 import bitarray as bit
+
 
 # b = bytearray("polinezja", "utf-8")
 #
@@ -64,11 +69,58 @@ import bitarray as bit
 
 # print(kluczNa3("1234567890123456abcdefghijklomnprstuwyxyz1234567"))
 
-desX("12345678akljshdflksdahugfsdruygpoiearutg[oasriug[oasdijg;lasdijg;aiuh[qwoerirfuas[dcji[aosdiuf[oasid",
-     "12345678abcdefgh12345678")
 
-np.int64()
+# def bloki_na_utf8(bloki):
+#     utf8_text = b""
+#     for blok in bloki:
+#         utf8_text += struct.pack('>Q', blok)
+#     return utf8_text.decode('utf-8')
+#
+#
+# # Przykładowe bloki 64-bitowe jako numpy array
+# bloki = np.array([0x48656c6c6f20776f, 0x726c6421],
+#                  dtype=np.int64)  # Hexadecymalne reprezentacje bloków "Hello wo" i "rld!"
+#
+# # Zamiana bloków na tekst UTF-8
+# tekst = bloki_na_utf8(bloki)
+#
+# print(tekst)  # Wynik: "Hello world!"
+# wynik = desX("82F86742448B0D99", "111111111234567811111111", 0, False)
+# print(wynik)
+from tkinter.filedialog import askopenfilename
+# tk.Tk().withdraw() # part of the import if you are not using other tkinter functions
 
-print(ROL(201326591, 2))
 
-print(zlaczLewyPrawy(134217728, 134217728))
+
+# fn = askopenfilename()
+# print("user chose", fn)
+
+
+wynik = desX("szyfr.txt", "111111111234567811111111", 1, True)
+print(wynik)
+
+
+# np.int64()
+#
+# print(ROL(201326591, 2))
+#
+# print(zlaczLewyPrawyKlucze(134217728, 134217728))
+#
+# print(getFromSBox(1, 1, 0))
+
+
+# def hex_to_int64(hex_text):  # Text w hexie zamieniony na int64
+#     int64_value = np.int64(int.from_bytes(bytes.fromhex(hex_text), byteorder='big', signed=True))
+#     return int64_value
+#
+#
+# print(hex_to_int64("F9D2E08FB85A6C9C"))
+
+
+# hex_values = wynik
+# byte_values = bytes.fromhex(hex_values)
+# result_string = byte_values.decode('utf-8')
+# print(result_string)
+# byte_values = result_string.encode('utf-8')
+# hex_values = byte_values.hex()
+# print(hex_values)

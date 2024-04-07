@@ -4,12 +4,13 @@
 #                Łukasz Centowski   247638      #
 #                                               #
 #################################################
+
 import DESX
 from DESX import *
 import tkinter as tk
+from tkinter.filedialog import askopenfilename
 
-
-keyProperLenth = 16
+keyProperLenth = 24
 
 
 def show_text_data(event=None):
@@ -20,19 +21,31 @@ def show_text_data(event=None):
 def show_text_key(event=None):
     key = entryKlucz.get()
     stringKey.set(key)
-    if len(key)== keyProperLenth:
+    if len(key) == keyProperLenth:
         entryKlucz.config(bg="green")
     else:
         entryKlucz.config(bg="white")
 
 
-def doTheDesX(dane, klucz):
+def doTheDesXFromEntry(dane, klucz, IsDecoding):
     if len(klucz) == keyProperLenth:
         entryOutput.config(state="normal")
         entryOutput.delete(0, "end")
-        entryOutput.insert(0, DESX.desX(dane, klucz))
+        entryOutput.insert(0, DESX.desX(dane, klucz, IsDecoding, False))
         entryOutput.config(state="readonly")
     else:
+        ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza", "Błąd", 0)
+        print("Klucz jest niepoprawnej długości!!!")
+
+def doTheDesXFromFile(dane, klucz, IsDecoding):
+    if len(klucz) == keyProperLenth:
+        entryOutput.config(state="normal")
+        entryOutput.delete(0, "end")
+        sciezka = askopenfilename()
+        entryOutput.insert(0, DESX.desX(sciezka, klucz, IsDecoding, True))
+        entryOutput.config(state="readonly")
+    else:
+        ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza", "Błąd", 0)
         print("Klucz jest niepoprawnej długości!!!")
 
 
@@ -56,7 +69,7 @@ stringOutput.set("")
 
 # ENTRYS
 
-entryDane = tk.Entry(frame)
+entryDane = tk.Entry(frame, width=100)
 entryDane.bind('<KeyRelease>', show_text_data)  # Wywołaj funkcję show_text_data po zwolnieniu klawisza
 entryDane.grid(column=0, row=0)
 
@@ -64,7 +77,7 @@ entryKlucz = tk.Entry(frame, width=100)
 entryKlucz.bind('<KeyRelease>', show_text_key)  # Wywołaj funkcję show_text_key po zwolnieniu klawisza
 entryKlucz.grid(column=2, row=0)
 
-entryOutput = tk.Entry(frame)
+entryOutput = tk.Entry(frame, width=100)
 entryOutput.config(state="readonly")
 entryOutput.grid(column=1, row=2)
 
@@ -76,16 +89,24 @@ dataLabel.grid(column=0, row=1)
 keyLabel = tk.Label(frame, textvariable=stringKey)  # Etykieta sprawdzajaca co jest w "kodzie" dla stringKey
 keyLabel.grid(column=2, row=1)
 
+# CHECKBOX
+decode = tk.BooleanVar()
+c1 = tk.Checkbutton(frame, text='Decode?', variable=decode, onvalue=1, offvalue=0)
+c1.grid(column=1, row=5)
 # BUTTONS
 
-desXButton = tk.Button(frame, text="DESX", command=lambda: doTheDesX(stringData.get(), stringKey.get()), pady=10,
+desXButton = tk.Button(frame, text="DESX", command=lambda: doTheDesXFromEntry(stringData.get(), stringKey.get(), decode.get()),
+                       pady=10,
                        padx=10)  # Przycisk wykonujacy DESX
 # but.pack(pady=0, padx=100)
 desXButton.grid(column=0, row=5)
 
+desXFromFileButton = tk.Button(frame, text="DESX from file", command=lambda: doTheDesXFromFile(stringData.get(), stringKey.get(), decode.get()), pady=10, padx=10)  # Przycisk odpowiedzialny za wyjscie
+desXFromFileButton.grid(column=2, row=5)
+
 quitButton = tk.Button(frame, text="Quit", command=root.destroy, pady=10, padx=10)  # Przycisk odpowiedzialny za wyjscie
 # but.pack(pady=0, padx=100)
-quitButton.grid(column=5, row=5)
+quitButton.grid(column=1, row=7)
 
 # Rozpocznij pętlę zdarzeń
 root.mainloop()
