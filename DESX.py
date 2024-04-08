@@ -57,7 +57,7 @@ def desX(dane, klucz, strona, czyPlik):
     :return:
     """
     if (len(klucz) != 48):  # sprawdzamy czy ten podany klucz jest poprawnej dlugosci
-        print(len(klucz))
+        # print(len(klucz))
         ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza,\nmusi miec 48 znaków!", "Błąd", 0)
         return
 
@@ -196,7 +196,7 @@ def xor(dane, klucz):
     dane_b = dane
     danePoXor = dane_b.__xor__(klucz)
 
-    print("Dane ", dane, " dane_b ", danePoXor)
+    # print("Dane ", dane, " dane_b ", danePoXor)
     return danePoXor
 
 
@@ -223,13 +223,6 @@ def hex_to_int64(hex_text):  # Tekst w hexie zamieniony na int64
     return int64_value
 
 
-def kluczNaInt64(klucz):  # Funkcja zwraca klucz w int64(który ma być podany jako UTF-8))
-    utf8_int_array = [int.from_bytes(znak.encode('utf-8')) for znak in klucz]
-    klucz = np.int64()  # utf8_int_array[0]
-    for i in range(len(utf8_int_array) - 1):
-        klucz += utf8_int_array[i]
-        klucz = klucz * 256
-    return klucz
 
 
 def getXPosFromYBits(var, x, y):
