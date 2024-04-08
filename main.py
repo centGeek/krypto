@@ -4,13 +4,14 @@
 #                Łukasz Centowski   247638      #
 #                                               #
 #################################################
+import re
 
 import DESX
 from DESX import *
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 
-keyProperLenth = 24
+keyProperLenth = 48
 
 
 def show_text_data(event=None):
@@ -37,10 +38,12 @@ def doTheDesXFromEntry(dane, klucz, IsDecoding):
         ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza", "Błąd", 0)
         print("Klucz jest niepoprawnej długości!!!")
 
+
 def doTheDesXFromFile(dane, klucz, IsDecoding):
     if len(klucz) == keyProperLenth:
         entryOutput.config(state="normal")
         entryOutput.delete(0, "end")
+        ctypes.windll.user32.MessageBoxW(0, "Wybierz plik na którym chcesz wykonać operacje", "Wybierz", 0)
         sciezka = askopenfilename()
         entryOutput.insert(0, DESX.desX(sciezka, klucz, IsDecoding, True))
         entryOutput.config(state="readonly")
@@ -49,8 +52,15 @@ def doTheDesXFromFile(dane, klucz, IsDecoding):
         print("Klucz jest niepoprawnej długości!!!")
 
 
+def validate(textDoWalidacji):
+    return bool(re.match("^[0-9a-fA-F]*$", textDoWalidacji))
+
+
 root = tk.Tk()
 root.title("DESX")
+
+# Zarejestrowanie naszej funkcji walidującej
+registerValidate = root.register(validate)
 
 frame = tk.Frame(root, padx=10, pady=10)
 
@@ -69,11 +79,11 @@ stringOutput.set("")
 
 # ENTRYS
 
-entryDane = tk.Entry(frame, width=100)
+entryDane = tk.Entry(frame, width=100, validate="key", validatecommand=(registerValidate, '%P'))
 entryDane.bind('<KeyRelease>', show_text_data)  # Wywołaj funkcję show_text_data po zwolnieniu klawisza
 entryDane.grid(column=0, row=0)
 
-entryKlucz = tk.Entry(frame, width=100)
+entryKlucz = tk.Entry(frame, width=100, validate="key", validatecommand=(registerValidate, '%P'))
 entryKlucz.bind('<KeyRelease>', show_text_key)  # Wywołaj funkcję show_text_key po zwolnieniu klawisza
 entryKlucz.grid(column=2, row=0)
 
@@ -95,13 +105,16 @@ c1 = tk.Checkbutton(frame, text='Decode?', variable=decode, onvalue=1, offvalue=
 c1.grid(column=1, row=5)
 # BUTTONS
 
-desXButton = tk.Button(frame, text="DESX", command=lambda: doTheDesXFromEntry(stringData.get(), stringKey.get(), decode.get()),
+desXButton = tk.Button(frame, text="DESX",
+                       command=lambda: doTheDesXFromEntry(stringData.get(), stringKey.get(), decode.get()),
                        pady=10,
                        padx=10)  # Przycisk wykonujacy DESX
 # but.pack(pady=0, padx=100)
 desXButton.grid(column=0, row=5)
 
-desXFromFileButton = tk.Button(frame, text="DESX from file", command=lambda: doTheDesXFromFile(stringData.get(), stringKey.get(), decode.get()), pady=10, padx=10)  # Przycisk odpowiedzialny za wyjscie
+desXFromFileButton = tk.Button(frame, text="DESX from file",
+                               command=lambda: doTheDesXFromFile(stringData.get(), stringKey.get(), decode.get()),
+                               pady=10, padx=10)  # Przycisk odpowiedzialny za wyjscie
 desXFromFileButton.grid(column=2, row=5)
 
 quitButton = tk.Button(frame, text="Quit", command=root.destroy, pady=10, padx=10)  # Przycisk odpowiedzialny za wyjscie

@@ -56,9 +56,9 @@ def desX(dane, klucz, strona, czyPlik):
     :param czyPlik: 0 - dane tekstowe w HEX, 1 - sciezka pliku w zmiennej "dane"
     :return:
     """
-    if (len(klucz) != 24):  # sprawdzamy czy ten podany klucz jest poprawnej dlugosci
+    if (len(klucz) != 48):  # sprawdzamy czy ten podany klucz jest poprawnej dlugosci
         print(len(klucz))
-        ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza,\nmusi miec 24 znaki!", "Błąd", 0)
+        ctypes.windll.user32.MessageBoxW(0, "Podano złą długość klucza,\nmusi miec 48 znaków!", "Błąd", 0)
         return
 
     blokiDanych = []
@@ -70,7 +70,7 @@ def desX(dane, klucz, strona, czyPlik):
     # Podobnie klucze zostaja podzielone oraz zamineione na odpowiednie typy
     klucze = kluczNa3(klucz)
     for i in range(len(klucze)):
-        klucze[i] = kluczNaInt64(klucze[i])
+        klucze[i] = hex_to_int64(klucze[i])
 
     if (strona):
         klucze.reverse()
@@ -78,8 +78,8 @@ def desX(dane, klucz, strona, czyPlik):
     #               XOR1                #
     #####################################
 
-    # for i in range(len(blokiDanych)):
-    #     blokiDanych[i] = xor(blokiDanych[i], klucze[0])
+    for i in range(len(blokiDanych)):
+        blokiDanych[i] = xor(blokiDanych[i], klucze[0])
 
     #####################################
     #            DES KLUCZE             #
@@ -174,8 +174,8 @@ def desX(dane, klucz, strona, czyPlik):
     #           XOR - 2             #
     #################################
 
-    # for i in range(len(blokiWyjsciowe)):
-    #     blokiWyjsciowe[i] = xor(blokiWyjsciowe[i], klucze[2])
+    for i in range(len(blokiWyjsciowe)):
+        blokiWyjsciowe[i] = xor(blokiWyjsciowe[i], klucze[2])
 
     if not czyPlik:
         output = bloki_na_hex(blokiWyjsciowe)
@@ -275,7 +275,8 @@ def permutationPC2(klucz):
 
 
 def kluczNa3(klucz):  # funkcja zwraca liste kluczy
-    return [klucz[i:i + blockSize] for i in range(0, len(klucz), blockSize)]
+
+    return [klucz[i:i + 16] for i in range(0, len(klucz), 16)]
 
 
 def podkluczeLewyPrawy(klucz):
