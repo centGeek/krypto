@@ -10,9 +10,9 @@ def Miller_Rabin_Test(liczba, dokladnosc):
     """
     blad = pow((1 / 4), dokladnosc)
     if liczba == 2 or liczba == 3:
-        return True, blad
+        return True
     if (liczba % 2 == 0) | (liczba <= 2):
-        return False, blad
+        return False
     s = 0
     d = liczba - 1
     while d % 2:
@@ -27,8 +27,8 @@ def Miller_Rabin_Test(liczba, dokladnosc):
         while (j < s) & (x is not (liczba - 1)):
             x = pow(x, 2, liczba)
             if x == 1:
-                return False, blad
+                return False
             j += 1
         if x is not (liczba - 1):
-            return False, blad
-    return True, blad
+            return False
+    return True
